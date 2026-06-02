@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Control mensual</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="header">
+        <div>
+          <p class="eyebrow">Control personal</p>
+          <h1>Control mensual</h1>
+        </div>
+        <button id="home-button" class="secondary-button home-button" type="button" hidden>Inicio</button>
+      </section>
+
+      <section id="home-view" class="home-view">
+        <button class="module-button" type="button" data-view="expenses">
+          <span>Gastos</span>
+          <strong>Cargar gastos, importar tarjetas y ver resumen mensual</strong>
+        </button>
+        <button class="module-button" type="button" data-view="transfers">
+          <span>Transferencias</span>
+          <strong>Registrar transferencias y comparar contra gastos del mes</strong>
+        </button>
+      </section>
+
+      <section id="expenses-view" class="view" hidden>
+        <section class="header compact-header">
+          <div>
+            <p class="eyebrow">Modulo</p>
+            <h2>Gastos</h2>
+          </div>
+          <div class="total-box">
+            <span>Total filtrado</span>
+            <strong id="total">$ 0,00</strong>
+          </div>
+        </section>
+
+        <section class="panel">
+          <form id="expense-form" class="expense-form">
+            <input type="hidden" name="id">
+            <label>
+              Mes
+              <input type="month" name="month" required>
+            </label>
+            <label>
+              Fecha
+              <input type="date" name="date" required>
+            </label>
+            <label>
+              Descripcion
+              <input type="text" name="description" placeholder="Compra semanal" required>
+            </label>
+            <label>
+              Importe
+              <input type="number" name="amount" min="0.01" step="0.01" placeholder="0.00" required>
+            </label>
+            <button type="submit" id="save-button">Guardar gasto</button>
+            <button type="button" id="cancel-edit" class="secondary-button" hidden>Cancelar</button>
+          </form>
+          <div class="quick-actions" id="default-expenses"></div>
+          <p id="message" class="message" aria-live="polite"></p>
+        </section>
+
+        <section class="panel">
+          <form id="pdf-form" class="pdf-form">
+            <label>
+              Tarjeta
+              <select name="card_type" required>
+                <option value="">Seleccionar</option>
+                <option value="visa">Visa</option>
+                <option value="master">Master</option>
+              </select>
+            </label>
+            <label>
+              Factura PDF de tarjeta
+              <input type="file" name="pdf" accept="application/pdf" required>
+            </label>
+            <button type="submit">Importar PDF</button>
+          </form>
+          <p id="pdf-message" class="message" aria-live="polite"></p>
+        </section>
+
+        <section class="toolbar">
+          <label>
+            Mes
+            <input type="month" id="filter-month">
+          </label>
+          <label>
+            Fecha
+            <input type="date" id="filter-date">
+          </label>
+          <label>
+            Buscar
+            <input type="search" id="filter-search" placeholder="Descripcion">
+          </label>
+          <button id="clear-filters" type="button">Limpiar</button>
+        </section>
+
+        <section class="summary-panel">
+          <h2>Resumen mensual</h2>
+          <div id="monthly-summary" class="summary-grid"></div>
+        </section>
+
+        <section class="table-panel">
+          <table>
+            <thead>
+              <tr>
+                <th>Mes</th>
+                <th>Fecha</th>
+                <th>Descripcion</th>
+                <th class="amount">Importe</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="expenses-body"></tbody>
+          </table>
+          <p id="empty-state" class="empty-state">Todavia no hay gastos cargados.</p>
+        </section>
+      </section>
+
+      <section id="transfers-view" class="view" hidden>
+        <section class="header compact-header">
+          <div>
+            <p class="eyebrow">Modulo</p>
+            <h2>Transferencias</h2>
+          </div>
+          <div class="total-box">
+            <span>Gastos - transferencias</span>
+            <strong id="transfer-balance">$ 0,00</strong>
+          </div>
+        </section>
+
+        <section class="panel">
+          <form id="transfer-form" class="transfer-form">
+            <label>
+              Fecha
+              <input type="date" name="date" required>
+            </label>
+            <label>
+              Importe
+              <input type="number" name="amount" min="0.01" step="0.01" placeholder="0.00" required>
+            </label>
+            <label>
+              Destino
+              <select name="destination" required>
+                <option value="">Seleccionar</option>
+                <option>Banco Nacion</option>
+                <option>Mercado Pago</option>
+              </select>
+            </label>
+            <button type="submit">Guardar transferencia</button>
+          </form>
+          <p id="transfer-message" class="message" aria-live="polite"></p>
+        </section>
+
+        <section class="toolbar">
+          <label>
+            Mes
+            <input type="month" id="transfer-filter-month">
+          </label>
+          <label>
+            Fecha
+            <input type="date" id="transfer-filter-date">
+          </label>
+          <button id="clear-transfer-filters" type="button">Limpiar</button>
+        </section>
+
+        <section class="summary-panel">
+          <h2>Resumen de transferencias</h2>
+          <div class="summary-grid">
+            <article class="summary-item">
+              <span>Mitad de gastos del mes</span>
+              <strong id="transfer-expenses-total">$ 0,00</strong>
+            </article>
+            <article class="summary-item">
+              <span>Transferencias del mes</span>
+              <strong id="transfers-total">$ 0,00</strong>
+            </article>
+            <article class="summary-item">
+              <span>Diferencia</span>
+              <strong id="transfer-balance-inline">$ 0,00</strong>
+            </article>
+          </div>
+        </section>
+
+        <section class="table-panel">
+          <table>
+            <thead>
+              <tr>
+                <th>Mes</th>
+                <th>Fecha</th>
+                <th>Destino</th>
+                <th class="amount">Importe</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="transfers-body"></tbody>
+          </table>
+          <p id="transfers-empty-state" class="empty-state">Todavia no hay transferencias cargadas.</p>
+        </section>
+      </section>
+    </main>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+  </body>
+</html>
