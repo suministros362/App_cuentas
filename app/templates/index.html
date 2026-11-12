@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#fff4d8">
+    <title>Control de cuentas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="header hero-header">
+        <div>
+          <p class="eyebrow">Tu espacio financiero</p>
+          <h1>Control de cuentas</h1>
+          <p class="hero-copy">Todo lo que entra y sale, claro y en un solo lugar.</p>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <span class="art-sun"></span>
+          <span class="art-window"><i></i><i></i><i></i><b></b><em></em></span>
+          <span class="art-note"></span>
+        </div>
+        <button id="home-button" class="secondary-button home-button" type="button" hidden>Inicio</button>
+      </section>
+
+      <section id="home-view" class="home-view">
+        <button class="module-button" type="button" data-view="expenses">
+          <span class="module-icon expenses-icon" aria-hidden="true">−</span>
+          <span class="module-content">
+            <strong>Gastos</strong>
+            <small>Carga gastos, importa tarjetas y revisa tu resumen mensual.</small>
+            <b>Ir a gastos <span aria-hidden="true">↗</span></b>
+          </span>
+        </button>
+        <button class="module-button" type="button" data-view="transfers">
+          <span class="module-icon transfers-icon" aria-hidden="true">↗</span>
+          <span class="module-content">
+            <strong>Transferencias</strong>
+            <small>Registra aportes y compáralos con los gastos del mes.</small>
+            <b>Ir a transferencias <span aria-hidden="true">↗</span></b>
+          </span>
+        </button>
+      </section>
+
+      <section id="expenses-view" class="view" hidden>
+        <section class="header compact-header">
+          <div>
+            <p class="eyebrow">Modulo</p>
+            <h2>Gastos</h2>
+          </div>
+          <div class="total-box">
+            <span>Total gastado neto del periodo</span>
+            <strong id="total">$ 0,00</strong>
+          </div>
+        </section>
+
+        <section class="panel">
+          <form id="expense-form" class="expense-form">
+            <input type="hidden" name="id">
+            <input type="hidden" name="movement_type" value="expense">
+            <input type="hidden" name="card_type">
+            <input type="hidden" name="payment_month">
+            <input type="hidden" name="statement_month">
+            <label>
+              Mes del gasto
+              <select name="month_number" class="month-select" required>
+                <option value="1">Enero</option><option value="2">Febrero</option>
+                <option value="3">Marzo</option><option value="4">Abril</option>
+                <option value="5">Mayo</option><option value="6">Junio</option>
+                <option value="7">Julio</option><option value="8">Agosto</option>
+                <option value="9">Septiembre</option><option value="10">Octubre</option>
+                <option value="11">Noviembre</option><option value="12">Diciembre</option>
+              </select>
+            </label>
+            <label>
+              Año
+              <input type="number" name="year" class="year-input" min="1" max="9999" required>
+            </label>
+            <label>
+              Fecha
+              <input type="date" name="date" required>
+            </label>
+            <label>
+              Descripcion
+              <select name="description" required>
+                <option value="" selected disabled>Seleccionar descripción</option>
+                <option value="alquiler">alquiler</option>
+                <option value="agua">agua</option>
+                <option value="luz">luz</option>
+                <option value="estacionamiento">estacionamiento</option>
+                <option value="gas">gas</option>
+              </select>
+            </label>
+            <label>
+              Importe
+              <input type="number" name="amount" min="0.01" step="0.01" placeholder="0.00" required>
+            </label>
+            <button type="submit" id="save-button">Guardar gasto</button>
+            <button type="button" id="cancel-edit" class="secondary-button" hidden>Cancelar</button>
+          </form>
+          <p id="message" class="message" aria-live="polite"></p>
+        </section>
+
+        <section class="panel">
+          <form id="pdf-form" class="pdf-form">
+            <label>
+              Tarjeta
+              <select name="card_type" required>
+                <option value="">Seleccionar</option>
+                <option value="visa">Visa</option>
+                <option value="mastercard">Mastercard</option>
+              </select>
+            </label>
+            <label>
+              Mes de pago
+              <select name="payment_month_number" class="month-select" required>
+                <option value="1">Enero</option><option value="2">Febrero</option>
+                <option value="3">Marzo</option><option value="4">Abril</option>
+                <option value="5">Mayo</option><option value="6">Junio</option>
+                <option value="7">Julio</option><option value="8">Agosto</option>
+                <option value="9">Septiembre</option><option value="10">Octubre</option>
+                <option value="11">Noviembre</option><option value="12">Diciembre</option>
+              </select>
+            </label>
+            <label>
+              Año de pago
+              <input type="number" name="payment_year" class="year-input" min="1" max="9999" required>
+            </label>
+            <label>
+              Mes de resumen
+              <select name="statement_month_number" class="month-select" required>
+                <option value="1">Enero</option><option value="2">Febrero</option>
+                <option value="3">Marzo</option><option value="4">Abril</option>
+                <option value="5">Mayo</option><option value="6">Junio</option>
+                <option value="7">Julio</option><option value="8">Agosto</option>
+                <option value="9">Septiembre</option><option value="10">Octubre</option>
+                <option value="11">Noviembre</option><option value="12">Diciembre</option>
+              </select>
+            </label>
+            <label>
+              Año de resumen
+              <input type="number" name="statement_year" class="year-input" min="1" max="9999" required>
+            </label>
+            <label>
+              Factura PDF de tarjeta
+              <input type="file" name="pdf" accept="application/pdf" required>
+            </label>
+            <button type="submit">Importar PDF</button>
+          </form>
+          <p id="pdf-message" class="message" aria-live="polite"></p>
+        </section>
+
+        <section id="pdf-preview" class="panel" hidden>
+          <h2>Revisar movimientos del PDF</h2>
+          <div class="table-panel preview-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Fecha compra</th>
+                  <th>Mes de pago</th>
+                  <th>Mes de resumen</th>
+                  <th>Descripcion</th>
+                  <th class="amount">Importe</th>
+                  <th>Tipo</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="pdf-preview-body"></tbody>
+            </table>
+          </div>
+          <div class="preview-actions">
+            <button type="button" id="confirm-pdf">Confirmar e importar</button>
+            <button type="button" id="cancel-pdf" class="secondary-button">Cancelar</button>
+          </div>
+        </section>
+
+        <section class="toolbar">
+          <label>
+            Mes
+            <select id="filter-month" class="month-select">
+              <option value="1">Enero</option><option value="2">Febrero</option>
+              <option value="3">Marzo</option><option value="4">Abril</option>
+              <option value="5">Mayo</option><option value="6">Junio</option>
+              <option value="7">Julio</option><option value="8">Agosto</option>
+              <option value="9">Septiembre</option><option value="10">Octubre</option>
+              <option value="11">Noviembre</option><option value="12">Diciembre</option>
+            </select>
+          </label>
+          <label>
+            Año
+            <input type="number" id="filter-year" class="year-input" min="1" max="9999" required>
+          </label>
+          <label>
+            Fecha
+            <input type="date" id="filter-date">
+          </label>
+          <label>
+            Desde
+            <input type="date" id="filter-from">
+          </label>
+          <label>
+            Hasta
+            <input type="date" id="filter-to">
+          </label>
+          <label>
+            Buscar
+            <input type="search" id="filter-search" placeholder="Descripcion">
+          </label>
+          <button id="clear-filters" type="button">Limpiar</button>
+        </section>
+
+        <section class="summary-panel">
+          <h2>Resumen del periodo</h2>
+          <div id="monthly-summary" class="summary-grid"></div>
+        </section>
+
+        <section class="summary-panel">
+          <h2>Tarjetas · mes de pago</h2>
+          <div id="card-summary" class="summary-grid"></div>
+          <section id="card-detail-panel" class="card-detail" hidden>
+            <div class="card-detail-header">
+              <h3 id="card-detail-title"></h3>
+              <button type="button" id="close-card-detail" class="secondary-button">Cerrar detalle</button>
+            </div>
+            <div class="table-panel">
+              <table>
+                <thead>
+                  <tr><th>Mes de resumen</th><th>Fecha</th><th>Descripcion</th><th>Tipo</th><th class="amount">Importe</th><th></th></tr>
+                </thead>
+                <tbody id="card-detail-body"></tbody>
+              </table>
+              <p id="card-detail-empty" class="empty-state" hidden>No hay movimientos de esta tarjeta en el mes de pago seleccionado.</p>
+            </div>
+          </section>
+        </section>
+
+        <section class="table-panel">
+          <table>
+            <thead>
+              <tr>
+                <th>Mes</th>
+                <th>Fecha</th>
+                <th>Descripcion</th>
+                <th class="amount">Importe</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="expenses-body"></tbody>
+          </table>
+          <p id="empty-state" class="empty-state">Todavia no hay gastos cargados.</p>
+        </section>
+      </section>
+
+      <section id="transfers-view" class="view" hidden>
+        <section class="header compact-header">
+          <div>
+            <p class="eyebrow">Modulo</p>
+            <h2>Transferencias</h2>
+          </div>
+          <div class="total-box">
+            <span>Brecha de cobertura</span>
+            <strong id="transfer-balance">$ 0,00</strong>
+          </div>
+        </section>
+
+        <section class="panel">
+          <form id="transfer-form" class="transfer-form">
+            <label>
+              Fecha
+              <input type="date" name="date" required>
+            </label>
+            <label>
+              Importe
+              <input type="number" name="amount" min="0.01" step="0.01" placeholder="0.00" required>
+            </label>
+            <label>
+              Destino
+              <select name="destination" required>
+                <option value="">Seleccionar</option>
+                <option>Banco Nacion</option>
+                <option>Mercado Pago</option>
+              </select>
+            </label>
+            <button type="submit">Guardar transferencia</button>
+          </form>
+          <p id="transfer-message" class="message" aria-live="polite"></p>
+        </section>
+
+        <section class="toolbar">
+          <label>
+            Mes
+            <select id="transfer-filter-month" class="month-select">
+              <option value="1">Enero</option><option value="2">Febrero</option>
+              <option value="3">Marzo</option><option value="4">Abril</option>
+              <option value="5">Mayo</option><option value="6">Junio</option>
+              <option value="7">Julio</option><option value="8">Agosto</option>
+              <option value="9">Septiembre</option><option value="10">Octubre</option>
+              <option value="11">Noviembre</option><option value="12">Diciembre</option>
+            </select>
+          </label>
+          <label>
+            Año
+            <input type="number" id="transfer-filter-year" class="year-input" min="1" max="9999" required>
+          </label>
+          <label>
+            Fecha
+            <input type="date" id="transfer-filter-date">
+          </label>
+          <label>
+            Desde
+            <input type="date" id="transfer-filter-from">
+          </label>
+          <label>
+            Hasta
+            <input type="date" id="transfer-filter-to">
+          </label>
+          <button id="clear-transfer-filters" type="button">Limpiar</button>
+        </section>
+
+        <section class="summary-panel">
+          <h2>Resumen de transferencias</h2>
+          <div class="summary-grid">
+            <article class="summary-item">
+              <span>Total gastado neto</span>
+              <strong id="total-spent">$ 0,00</strong>
+            </article>
+            <article class="summary-item">
+              <span>Reintegros</span>
+              <strong id="total-refunds">$ 0,00</strong>
+            </article>
+            <article class="summary-item">
+              <span>50% del gasto neto (referencia de cobertura)</span>
+              <strong id="transfer-expenses-total">$ 0,00</strong>
+            </article>
+            <article class="summary-item">
+              <span>Total transferido</span>
+              <strong id="transfers-total">$ 0,00</strong>
+            </article>
+            <article class="summary-item">
+              <span>Brecha de cobertura (50% gastos - transferencias)</span>
+              <strong id="transfer-balance-inline">$ 0,00</strong>
+            </article>
+          </div>
+        </section>
+
+        <section class="table-panel">
+          <table>
+            <thead>
+              <tr>
+                <th>Mes</th>
+                <th>Fecha</th>
+                <th>Destino</th>
+                <th class="amount">Importe</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="transfers-body"></tbody>
+          </table>
+          <p id="transfers-empty-state" class="empty-state">Todavia no hay transferencias cargadas.</p>
+        </section>
+      </section>
+    </main>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+  </body>
+</html>
